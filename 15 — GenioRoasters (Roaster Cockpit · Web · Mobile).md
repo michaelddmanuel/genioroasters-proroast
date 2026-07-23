@@ -4,7 +4,26 @@
 
 > Built the same way we shipped **NeoGenesis** — extract the UI **1:1 from Figma**, stand up the proven **Vite + React + TS + Tailwind v4** web scaffold, then extend into an **Expo SDK 54** app. Here the **mobile cockpit is the hero** (you use it standing at the roaster), with a **web dashboard + marketing site** as the companion.
 
-**Status:** Blueprint → awaiting reference pack · **Type:** Vibe-coding springboard · **Design source:** Figma `Dev-Ready · Genio Roasters · Final UI` (`x6NZnbTFzcGU9DCvYHIftH`) · **Origin:** Ideas Backlog **B2 — "Roast Companion"** · **Date:** 2026-07-23
+**Status:** ✅ **SHIPPED** (see box below) · **Type:** Vibe-coding springboard · **Design source:** Figma `Dev-Ready · Genio Roasters · Final UI` (`x6NZnbTFzcGU9DCvYHIftH`) · **Origin:** Ideas Backlog **B2 — "Roast Companion"** · **Date:** 2026-07-23
+
+---
+
+> ## 🚢 SHIPPED — build log & corrections (2026-07-23)
+>
+> **Links**
+> | Deliverable | URL | Proof |
+> |---|---|---|
+> | GitHub repo | <https://github.com/michaelddmanuel/genioroasters-proroast> | pushed `main` |
+> | Web cockpit (live) | <https://proroast-web.vercel.app> | HTTP 200 · deep routes `/live` `/schedule` 200 · JS bundle `application/javascript` |
+> | Mobile companion, web export (live) | <https://proroast-app.vercel.app> | HTTP 200 · Expo bundle `application/javascript` |
+>
+> **⚠️ Blueprint correction (discovered at capture):** the assumed two-group split below (§0, §3, §11) was **wrong**. The Figma file is **ONE desktop web application** — *"ProRoast Evolution"* by Genio Roasters, an operator cockpit for their drum roasters. There are **no mobile frames**. What shipped:
+> - **`web/` — 1:1 recreation** (Vite + React 19 + TS, hand-rolled CSS tokens, no Tailwind): Sign In/Up/Reset (photo split-layout) · **Live Roasting** (standby + active: dual-pane SVG chart, live value tags, phase bar, crack histogram, batch queue, Save-profile drawer, util rail) · Roasting Profiles (+ Edit drawer) · Schedule (+ Add-session form w/ computed batches: 200 kg → 57 × 4 kg = 228 kg, exactly as designed) · Stock (+ Add stock) · User Management (inferred; no frame).
+> - **`mobile/` — ADAPTED companion** (Expo SDK 54 · RN 0.81.5 · react-native-svg): Live / Queue / Profiles / Stock tabs, same tokens + data + sim engine. Not 1:1 (nothing to be 1:1 *to*).
+> - **Simulated-roast engine** (`web/src/sim/roast.ts`, shared to mobile): seeded PRNG, 18:30 roast, bean/air/exhaust/drum + RoR + cracks + fan/power/RPM; demo runs at 14× (~80 s). Zero hardware, read-only telemetry (safety line held).
+> - **Screen inventory (as-shipped):** signin ☑☑ · live-standby ☑☑ · live-active ☑☑ · save-profile drawer ☑☑ · profiles+edit ☑☑ · schedule ☑☑ · add-session ☑☑ · stock ☑☑ · add-stock ☑☑ · users ☑ (inferred) — Built ☑ / Verified-vs-reference ☑; 34 reference PNGs in `design-reference/`.
+> - Design quirks preserved deliberately: "Rosting profiles", "Casta Rica Fancy" (present in source frames).
+> - **Brand note:** Genio Roasters is a real manufacturer; repo README carries an unaffiliated-recreation disclaimer.
 
 ---
 
