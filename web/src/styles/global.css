@@ -236,6 +236,31 @@ table.uui tbody tr:hover { background: var(--gray-50); }
 .drawer-foot { display: flex; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--gray-200); }
 .drawer-foot .btn { flex: 1; }
 
+/* ---------- Confirm modal (frame 16) ---------- */
+.modal-scrim {
+  position: fixed; inset: 0; background: rgba(52, 64, 84, 0.7); z-index: 50;
+  display: grid; place-items: center;
+}
+.modal {
+  width: 410px; background: #fff; border-radius: 12px; padding: 24px;
+  box-shadow: var(--shadow-lg); animation: modal-in 0.18s ease;
+}
+@keyframes modal-in { from { transform: translateY(8px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-icon {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--primary-200);
+  border: 6px solid var(--primary-100); display: grid; place-items: center; color: var(--primary-700);
+  box-sizing: content-box; margin: -4px 0 12px -4px;
+}
+.modal-title { font-size: 16px; font-weight: 600; color: var(--gray-900); font-family: var(--font-display); }
+.modal-sub { font-size: 13.5px; color: var(--gray-500); margin-top: 4px; }
+.modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+.modal-actions .btn { flex: 1; height: 44px; }
+.btn-cancel {
+  background: #fff; border: 1px solid var(--gray-300); color: var(--sky);
+  box-shadow: var(--shadow-xs);
+}
+.btn-cancel:hover { background: var(--gray-50); }
+
 /* stars */
 .stars { display: flex; gap: 6px; border: 1px solid var(--gray-300); border-radius: 8px; padding: 10px 12px; box-shadow: var(--shadow-xs); }
 .stars button { background: none; border: 0; padding: 0; display: grid; place-items: center; }

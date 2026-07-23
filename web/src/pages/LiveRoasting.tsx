@@ -22,6 +22,7 @@ export default function LiveRoasting() {
   const [elapsed, setElapsed] = useState(0);
   const [tab, setTab] = useState<"current" | "queue" | "completed">("current");
   const [drawer, setDrawer] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const [saveDefault, setSaveDefault] = useState(false);
   const [profileName, setProfileName] = useState("");
   const [rating, setRating] = useState(8);
@@ -153,7 +154,7 @@ export default function LiveRoasting() {
                 </div>
                 {b.status === "current" && running && (
                   <div className="hover-actions">
-                    <button className="mini light" onClick={stop}>Remove Roast</button>
+                    <button className="mini light" onClick={() => setConfirmRemove(true)}>Remove Roast</button>
                     <button className="mini dark" onClick={() => setDrawer(true)}>Save Roast profile</button>
                   </div>
                 )}
@@ -255,6 +256,33 @@ export default function LiveRoasting() {
             </div>
           </div>
         </Drawer>
+      )}
+
+      {confirmRemove && (
+        <div className="modal-scrim" onClick={() => setConfirmRemove(false)}>
+          <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">
+              <Icon name="alert" size={20} />
+            </div>
+            <div className="modal-title">Are you sure you want to remove this roast?</div>
+            {/* "ression" is in the source design — preserved (1:1) */}
+            <div className="modal-sub">This will update your roast ression</div>
+            <div className="modal-actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setConfirmRemove(false);
+                  setRunning(false);
+                  setElapsed(0);
+                  setBatches((b) => b.map((x) => (x.id === 1 ? { ...x, progress: 0, time: undefined } : x)));
+                }}
+              >
+                Confirm
+              </button>
+              <button className="btn btn-cancel" onClick={() => setConfirmRemove(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
