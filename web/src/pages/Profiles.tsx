@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Icon } from "../components/Icon";
 import { Drawer, Stars } from "../components/ui";
 import { RoastChart } from "../components/RoastChart";
@@ -7,10 +8,13 @@ import { beans, roastProfiles, roasters } from "../data";
 
 const reviewData = generateRoast(7);
 
+/** Profile detail (frames 13/37) — chart review + Edit drawer, reached from the profiles table */
 export default function Profiles() {
+  const { id } = useParams();
+  const selected = roastProfiles.find((p) => p.id === id) ?? roastProfiles[0];
   const [drawer, setDrawer] = useState(true);
-  const [profile, setProfile] = useState(roastProfiles[0]);
-  const [rating, setRating] = useState(roastProfiles[0].rating);
+  const [profile, setProfile] = useState(selected);
+  const [rating, setRating] = useState(selected.rating);
 
   return (
     <div className="live" style={{ height: "100%" }}>

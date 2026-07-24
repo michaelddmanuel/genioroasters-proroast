@@ -1,8 +1,10 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { Rail, Sidebar } from "./components/Sidebar";
 import { SignIn, SignUp, ResetPassword } from "./pages/Auth";
 import LiveRoasting from "./pages/LiveRoasting";
 import Profiles from "./pages/Profiles";
+import ProfilesList from "./pages/ProfilesList";
 import Users from "./pages/Users";
 import Schedule from "./pages/Schedule";
 import ScheduleNew from "./pages/ScheduleNew";
@@ -12,10 +14,14 @@ import { Icon } from "./components/Icon";
 
 function Shell() {
   const { pathname } = useLocation();
-  const collapsed = pathname.startsWith("/live") || pathname.startsWith("/profiles");
+  // rail by default on the cockpit + profile detail (frames 12/37); full sidebar elsewhere (frame 36)
+  const routeDefault = pathname.startsWith("/live") || /^\/profiles\/.+/.test(pathname);
+  const [manual, setManual] = useState<boolean | null>(null);
+  const collapsed = manual ?? routeDefault;
+  const toggle = () => setManual(!collapsed);
   return (
     <div className="shell">
-      {collapsed ? <Rail /> : <Sidebar />}
+      {collapsed ? <Rail onToggle={toggle} /> : <Sidebar onToggle={toggle} />}
       <main className="shell-main">
         <Outlet />
       </main>
@@ -45,7 +51,8 @@ export default function App() {
         <Route path="/reset" element={<ResetPassword />} />
         <Route element={<Shell />}>
           <Route path="/live" element={<LiveRoasting />} />
-          <Route path="/profiles" element={<Profiles />} />
+          <Route path="/profiles" element={<ProfilesList />} />
+          <Route path="/profiles/:id" element={<Profiles />} />
           <Route path="/users" element={<Users />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/schedule/new" element={<ScheduleNew />} />

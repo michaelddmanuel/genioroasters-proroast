@@ -23,6 +23,7 @@
 > - **Simulated-roast engine** (`web/src/sim/roast.ts`, shared to mobile): seeded PRNG, 18:30 roast, bean/air/exhaust/drum + RoR + cracks + fan/power/RPM; demo runs at 14× (~80 s). Zero hardware, read-only telemetry (safety line held).
 > - **Screen inventory (as-shipped):** signin ☑☑ · live-standby ☑☑ · live-active ☑☑ · save-profile drawer ☑☑ · profiles+edit ☑☑ · schedule ☑☑ · add-session ☑☑ · stock ☑☑ · add-stock ☑☑ · users ☑ (inferred) — Built ☑ / Verified-vs-reference ☑; 34 reference PNGs in `design-reference/`.
 > - Design quirks preserved deliberately: "Rosting profiles", "Casta Rica Fancy" (present in source frames).
+> - **Round 2 (user-flagged frames 35–38, captured to `design-reference/`):** ✅ Roasting Profiles **table page** (frame 36: tabs, roaster avatars, 10-star scores, descriptions) with row → detail navigation · ✅ delete-confirmation modals for roast profiles (frames 35/38 verbatim copy incl. "Raost") and users · ✅ Add User drawer + working add/delete · ✅ batch queue **drag-and-drop reorder** (statuses recompute by position) · ✅ sidebar **collapse/expand toggle** (full menu ↔ icon rail, frames 36/37) — all verified in-browser and redeployed.
 > - **Brand note:** Genio Roasters is a real manufacturer; repo README carries an unaffiliated-recreation disclaimer.
 
 ---

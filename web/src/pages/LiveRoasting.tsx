@@ -28,6 +28,8 @@ export default function LiveRoasting() {
   const [rating, setRating] = useState(8);
   const [notes, setNotes] = useState("");
   const [batches, setBatches] = useState(initialBatches);
+  const [dragId, setDragId] = useState<number | null>(null);
+  const [overId, setOverId] = useState<number | null>(null);
   const raf = useRef<number | null>(null);
   const lastTs = useRef<number>(0);
 
@@ -62,16 +64,35 @@ export default function LiveRoasting() {
   const start = () => {
     setElapsed(0);
     setRunning(true);
-    setBatches((b) => b.map((x) => (x.id === 1 ? { ...x, progress: 0 } : x)));
+    setBatches((b) => b.map((x) => (x.status === "current" ? { ...x, progress: 0 } : x)));
   };
   const stop = () => setRunning(false);
 
   useEffect(() => {
     if (running) {
-      setBatches((b) => b.map((x) => (x.id === 1 ? { ...x, progress: pctRoast, time: fmtClock(elapsed, true) } : x)));
+      setBatches((b) => b.map((x) => (x.status === "current" ? { ...x, progress: pctRoast, time: fmtClock(elapsed, true) } : x)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pctRoast, running]);
+
+  /** drag-and-drop queue reorder — statuses recompute by position */
+  const handleDrop = () => {
+    if (dragId != null && overId != null && dragId !== overId) {
+      setBatches((b) => {
+        const arr = [...b];
+        const from = arr.findIndex((x) => x.id === dragId);
+        const to = arr.findIndex((x) => x.id === overId);
+        const [moved] = arr.splice(from, 1);
+        arr.splice(to, 0, moved);
+        return arr.map((x, i) => ({
+          ...x,
+          status: (i === 0 ? "current" : i === 1 ? "next" : "queued") as BatchStatus,
+        }));
+      });
+    }
+    setDragId(null);
+    setOverId(null);
+  };
 
   const shownBatches =
     tab === "current" ? batches : tab === "queue" ? batches.filter((b) => b.status !== "current") : batches.filter(() => false);
@@ -137,7 +158,27 @@ export default function LiveRoasting() {
 
             {shownBatches.length === 0 && <div style={{ color: "var(--gray-400)", fontSize: 12.5, textAlign: "center", padding: "30px 0" }}>No completed batches yet</div>}
             {shownBatches.map((b) => (
-              <div className="batch-card" key={b.id}>
+              <div
+                className={
+                  "batch-card" +
+                  (dragId === b.id ? " dragging" : "") +
+                  (overId === b.id && dragId !== b.id ? " drag-over" : "")
+                }
+                key={b.id}
+                draggable
+                onDragStart={(e) => {
+                  setDragId(b.id);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  if (overId !== b.id) setOverId(b.id);
+                }}
+                onDrop={handleDrop}
+                onDragEnd={handleDrop}
+              >
+                <span className="drag-handle" title="Drag to reorder"><Icon name="drag" size={15} /></span>
                 <div className="t">{b.name}</div>
                 <div className="progress">
                   <div className="track"><div className="fill" style={{ width: `${b.progress}%`, background: b.status === "current" ? "var(--navy-mid)" : "var(--gray-300)" }} /></div>

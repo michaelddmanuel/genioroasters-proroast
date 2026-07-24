@@ -76,6 +76,9 @@ export const roastProfiles: RoastProfile[] = [
   { name: "Morning Roast", id: "CRF -00090- GEVO", roaster: "Olivia Jacobs", defaultFor: "Costa Rica Fancy", rating: 8, notes: "Morning roast coffee roast profile." },
   { name: "Slow Development", id: "JBM -00072- GEVO", roaster: "Ben Findman", defaultFor: "Jamaican Blue Mountain", rating: 7, notes: "Long development for sweetness." },
   { name: "Nordic Light", id: "EY -00114- GEVO", roaster: "Lana Steiner", defaultFor: "Ethiopian Yirgacheffe", rating: 9, notes: "Light, floral, fast finish." },
+  { name: "Espresso Classic", id: "CS -00121- GEVO", roaster: "Demi Wilkinson", defaultFor: "Colombian Supremo", rating: 9, notes: "Balanced espresso base profile." },
+  { name: "Bright Filter", id: "KAA -00133- GEVO", roaster: "Candice Wu", defaultFor: "Kenyan AA", rating: 9, notes: "Bright acidity, complex cup." },
+  { name: "Full Body Dark", id: "SM -00140- GEVO", roaster: "Natali Craig", defaultFor: "Sumatra Mandheling", rating: 9, notes: "Low acidity, heavy body." },
 ];
 
 export const machine = "ProRoast Evolution";

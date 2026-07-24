@@ -158,6 +158,10 @@ table.uui tbody tr:hover { background: var(--gray-50); }
 .icon-btn { background: none; border: 0; color: var(--gray-400); padding: 6px; border-radius: 6px; display: inline-flex; }
 .icon-btn:hover { background: var(--gray-100); color: var(--gray-600); }
 
+/* profiles table (frame 36) */
+.score-stars { display: inline-flex; gap: 2px; }
+table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 /* progress bar */
 .progress { display: flex; align-items: center; gap: 10px; min-width: 120px; }
 .progress .track { flex: 1; height: 8px; border-radius: 999px; background: var(--gray-200); overflow: hidden; }
@@ -306,7 +310,7 @@ table.uui tbody tr:hover { background: var(--gray-50); }
 /* full sidebar */
 .sidebar {
   width: 248px; background: var(--navy); color: #fff; display: flex; flex-direction: column;
-  padding: 20px 16px 16px; flex-shrink: 0; border-radius: 0 12px 12px 0;
+  padding: 20px 16px 16px; flex-shrink: 0; border-radius: 0 12px 12px 0; position: relative;
 }
 .sidebar .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 18px; }
 .sidebar .brand span { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
@@ -333,8 +337,16 @@ table.uui tbody tr:hover { background: var(--gray-50); }
 /* collapsed rail */
 .rail {
   width: 64px; background: var(--navy); color: #fff; display: flex; flex-direction: column;
-  align-items: center; padding: 16px 0; gap: 6px; flex-shrink: 0; border-radius: 0 12px 12px 0;
+  align-items: center; padding: 16px 0; gap: 6px; flex-shrink: 0; border-radius: 0 12px 12px 0; position: relative;
 }
+
+/* sidebar collapse/expand toggle */
+.side-toggle {
+  position: absolute; top: 30px; right: -13px; width: 26px; height: 26px; border-radius: 50%;
+  background: #fff; border: 1px solid var(--gray-200); color: var(--gray-500);
+  display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow-sm); z-index: 6;
+}
+.side-toggle:hover { color: var(--navy-mid); background: var(--gray-50); }
 .rail .rail-btn {
   width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center;
   color: rgba(255,255,255,0.85); background: none; border: 0;
@@ -390,8 +402,15 @@ table.uui tbody tr:hover { background: var(--gray-50); }
 .queue-total .row .lbl { color: var(--gray-400); font-weight: 400; }
 .batch-card {
   border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px; margin-bottom: 12px;
-  background: #fff; box-shadow: var(--shadow-xs); position: relative;
+  background: #fff; box-shadow: var(--shadow-xs); position: relative; cursor: grab;
 }
+.batch-card:active { cursor: grabbing; }
+.batch-card.dragging { opacity: 0.45; }
+.batch-card.drag-over { border-color: var(--primary-400); box-shadow: 0 0 0 2px var(--primary-100); }
+.batch-card .drag-handle {
+  position: absolute; top: 10px; right: 8px; color: var(--gray-300); display: inline-flex;
+}
+.batch-card:hover .drag-handle { color: var(--gray-400); }
 .batch-card .t { font-size: 14px; font-weight: 600; color: var(--gray-900); font-family: var(--font-display); margin-bottom: 8px; }
 .batch-card .foot { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--gray-500); }
 .batch-card .foot .kg { font-weight: 600; color: var(--gray-700); }

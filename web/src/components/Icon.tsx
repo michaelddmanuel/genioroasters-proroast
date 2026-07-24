@@ -158,6 +158,23 @@ const paths: Record<string, React.ReactNode> = {
       <path d="M3.5 7 12 13l8.5-6" />
     </>
   ),
+  "chevron-left": <path d="m14.5 6-5.5 6 5.5 6" />,
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  drag: (
+    <>
+      <circle cx="9" cy="6" r="1.1" />
+      <circle cx="15" cy="6" r="1.1" />
+      <circle cx="9" cy="12" r="1.1" />
+      <circle cx="15" cy="12" r="1.1" />
+      <circle cx="9" cy="18" r="1.1" />
+      <circle cx="15" cy="18" r="1.1" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 20, stroke = 1.7, className }: IconProps) {

@@ -15,10 +15,15 @@ const FOOT = [
   { to: "/settings", label: "Settings", icon: "gear" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onToggle }: { onToggle?: () => void }) {
   const nav = useNavigate();
   return (
     <aside className="sidebar">
+      {onToggle && (
+        <button className="side-toggle" title="Collapse menu" onClick={onToggle}>
+          <Icon name="chevron-left" size={15} />
+        </button>
+      )}
       <div className="brand">
         <LogoMark size={30} />
         <span>ProRoast</span>
@@ -59,10 +64,15 @@ export function Sidebar() {
 }
 
 /** Collapsed icon rail used on the Live Roasting cockpit */
-export function Rail() {
+export function Rail({ onToggle }: { onToggle?: () => void }) {
   const nav = useNavigate();
   return (
     <aside className="rail">
+      {onToggle && (
+        <button className="side-toggle" title="Expand menu" onClick={onToggle}>
+          <Icon name="chevron-right" size={15} />
+        </button>
+      )}
       <div style={{ marginBottom: 10 }}>
         <LogoMark size={28} />
       </div>
