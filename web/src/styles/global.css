@@ -207,7 +207,7 @@ table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; tex
 .pagination .page:hover:not(.active) { background: var(--gray-50); }
 
 /* ---------- Page scaffolding ---------- */
-.page-banner { height: 120px; background-size: cover; background-position: center 40%; }
+.page-banner { height: 120px; background-size: cover; background-position: center 40%; margin-left: -12px; }
 .page-body { padding: 20px 32px 48px; }
 .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--gray-400); }
 .breadcrumb .crumb { background: var(--gray-100); border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: 500; color: var(--gray-700); }
@@ -330,7 +330,9 @@ table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; tex
 
 /* ---------- App shell ---------- */
 .shell { display: flex; height: 100vh; overflow: hidden; }
-.shell-main { flex: 1; overflow-y: auto; background: #fff; min-width: 0; }
+.shell-main { flex: 1; overflow-y: auto; background: #fff; min-width: 0; padding-left: 12px; }
+/* sidebar/rail rounded corners overlap the banner — image runs behind the curve */
+.sidebar, .rail { margin-right: -12px; z-index: 5; }
 
 /* full sidebar */
 .sidebar {
