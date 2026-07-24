@@ -35,6 +35,11 @@ export default function LiveRoasting() {
   const [profileName, setProfileName] = useState("");
   const [rating, setRating] = useState(8);
   const [notes, setNotes] = useState("");
+  const [panelNote, setPanelNote] = useState("");
+  const [savedNotes, setSavedNotes] = useState<{ text: string; meta: string }[]>([
+    { text: "Smells grassy → sweet at yellowing.", meta: "Olivia · batch 1" },
+    { text: "Try 2% less power after first crack next time.", meta: "Olivia · last session" },
+  ]);
   const [batches, setBatches] = useState(initialBatches);
   const [dragId, setDragId] = useState<number | null>(null);
   const [overId, setOverId] = useState<number | null>(null);
@@ -452,15 +457,26 @@ export default function LiveRoasting() {
             <div className="roast-panel-section">
               <div className="sec-t">Add a note</div>
               <div className="field">
-                <textarea className="plain" placeholder="Note colour change, smell, adjustments…" />
+                <textarea className="plain" placeholder="Note colour change, smell, adjustments…" value={panelNote} onChange={(e) => setPanelNote(e.target.value)} />
               </div>
-              <button className="btn btn-primary" style={{ width: "100%", marginTop: 10 }}><Icon name="comment" size={15} /> Save note</button>
+              <button
+                className="btn btn-primary"
+                style={{ width: "100%", marginTop: 10 }}
+                disabled={!panelNote.trim()}
+                onClick={() => {
+                  setSavedNotes((n) => [{ text: panelNote.trim(), meta: `Olivia · ${running || elapsed > 0 ? fmtClock(elapsed) : "standby"}` }, ...n]);
+                  setPanelNote("");
+                }}
+              >
+                <Icon name="comment" size={15} /> Save note
+              </button>
             </div>
             <div className="roast-panel-section">
               <div className="sec-t">Earlier</div>
               <div className="event-list">
-                <div className="event-row hit"><span className="dot info" /><div><div className="l">Smells grassy → sweet at yellowing.</div><div className="s">Olivia · batch 1</div></div></div>
-                <div className="event-row hit"><span className="dot info" /><div><div className="l">Try 2% less power after first crack next time.</div><div className="s">Olivia · last session</div></div></div>
+                {savedNotes.map((n, i) => (
+                  <div className="event-row hit" key={i}><span className="dot info" /><div><div className="l">{n.text}</div><div className="s">{n.meta}</div></div></div>
+                ))}
               </div>
             </div>
           </div>
