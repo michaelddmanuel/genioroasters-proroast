@@ -10,7 +10,10 @@ import Schedule from "./pages/Schedule";
 import ScheduleNew from "./pages/ScheduleNew";
 import Inventory from "./pages/Inventory";
 import InventoryNew from "./pages/InventoryNew";
-import { Icon } from "./components/Icon";
+import Support from "./pages/Support";
+import MachineSettings from "./pages/MachineSettings";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
 
 function Shell() {
   const { pathname } = useLocation();
@@ -25,18 +28,6 @@ function Shell() {
       <main className="shell-main">
         <Outlet />
       </main>
-    </div>
-  );
-}
-
-function Stub({ title, blurb }: { title: string; blurb: string }) {
-  return (
-    <div className="stub-page">
-      <div style={{ display: "inline-grid", placeItems: "center", width: 56, height: 56, borderRadius: 14, background: "var(--primary-100)", color: "var(--navy-mid)", marginBottom: 16 }}>
-        <Icon name="gear" size={26} />
-      </div>
-      <h1>{title}</h1>
-      <p>{blurb}</p>
     </div>
   );
 }
@@ -58,9 +49,10 @@ export default function App() {
           <Route path="/schedule/new" element={<ScheduleNew />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/inventory/new" element={<InventoryNew />} />
-          <Route path="/support" element={<Stub title="Support" blurb="Contact Genio Roasters support — support@genioroasters.co.za" />} />
-          <Route path="/machine-settings" element={<Stub title="MachineSettings" blurb="ProRoast Evolution machine configuration." />} />
-          <Route path="/settings" element={<Stub title="Settings" blurb="Workspace and account settings." />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/machine-settings" element={<MachineSettings />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>

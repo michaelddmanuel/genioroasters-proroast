@@ -50,11 +50,13 @@ export function Sidebar({ onToggle }: { onToggle?: () => void }) {
         ))}
       </nav>
       <div className="sidebar-user">
-        <img src="/assets/avatar-olivia.png" alt="Olivia Rhye" />
-        <div>
-          <div className="n">Olivia Rhye</div>
-          <div className="e">olivia@motherland.com</div>
-        </div>
+        <button className="user-link" title="View profile" onClick={() => nav("/profile")}>
+          <img src="/assets/avatar-olivia.png" alt="Olivia Rhye" />
+          <div>
+            <div className="n">Olivia Rhye</div>
+            <div className="e">olivia@motherland.com</div>
+          </div>
+        </button>
         <button className="out" title="Log out" onClick={() => nav("/signin")}>
           <Icon name="logout" size={18} />
         </button>
@@ -90,7 +92,7 @@ export function Rail({ onToggle }: { onToggle?: () => void }) {
           <Icon name={n.icon} size={19} />
         </NavLink>
       ))}
-      <img className="avatar" src="/assets/avatar-olivia.png" alt="Olivia Rhye" onClick={() => nav("/signin")} style={{ cursor: "pointer" }} />
+      <img className="avatar" src="/assets/avatar-olivia.png" alt="Olivia Rhye" title="View profile" onClick={() => nav("/profile")} style={{ cursor: "pointer" }} />
     </aside>
   );
 }
