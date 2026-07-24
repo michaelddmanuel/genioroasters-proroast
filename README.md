@@ -1,5 +1,7 @@
 # ProRoast Evolution — Roaster Cockpit
 
+**Live:** [proroast-web.vercel.app](https://proroast-web.vercel.app) (web cockpit) · [proroast-app.vercel.app](https://proroast-app.vercel.app) (mobile companion, web build)
+
 A 1:1 recreation of the **ProRoast Evolution** coffee-roaster operator cockpit
 (design: *Dev-Ready · Genio Roasters · Final UI* Figma file), plus a mobile
 companion app. Built from the GenioRoasters blueprint.
@@ -10,6 +12,16 @@ companion app. Built from the GenioRoasters blueprint.
 > drum temps, rate-of-rise, crack events, fan/power/RPM modulation) so the
 > cockpit demos live with zero hardware. v1 is read-only telemetry: it never
 > controls roaster heat.
+
+## Screenshots
+
+**Live Roasting cockpit — simulated roast at 11:40, first crack underway**
+
+![Live Roasting cockpit](docs/live-cockpit.png)
+
+| Sign in | Mobile companion (live roast) |
+| --- | --- |
+| ![Sign in](docs/signin.png) | ![Mobile companion](docs/mobile-live.png) |
 
 ## Apps
 
