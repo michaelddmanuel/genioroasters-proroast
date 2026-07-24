@@ -22,6 +22,7 @@ export default function LiveRoasting() {
   const [elapsed, setElapsed] = useState(0);
   const [tab, setTab] = useState<"current" | "queue" | "completed">("current");
   const [drawer, setDrawer] = useState(false);
+  const [panel, setPanel] = useState<string | null>("trend");
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [saveDefault, setSaveDefault] = useState(false);
   const [profileName, setProfileName] = useState("");
@@ -209,50 +210,193 @@ export default function LiveRoasting() {
           <RoastChart data={roastData} elapsed={elapsed} running={running || elapsed > 0} />
         </div>
 
-        {/* roast data panel */}
-        <div className="roast-panel">
-          <div className="roast-panel-title">Roast Profile Data</div>
-          <div className="roast-panel-section">
-            <div className="sec-t">Roast Details</div>
-            <div className="tiles">
-              <Tile label="Roast Time" value={running || elapsed > 0 ? fmtClock(elapsed) : "14:33"} color="#FFE6D9" wide />
-              <Tile label="Bean Temperature" value={`${cur.bean || 195.8} °C`} color="#FFE6D9" />
-              <Tile label="Bean RoR" value={`${cur.ror || 12.6} °C/30s`} color="#FFE6D9" />
-              <Tile label="Exhaust Temp" value={`${cur.exhaust || 207.3} °C`} color="#FFF5CE" />
-              <Tile label="Recirculating Temp" value={`${cur.drum || 207.3} °C`} color="#FCE7F6" />
-              <Tile label="First Crack" value={devPct > 0 ? `${devPct.toFixed(1)}%  |  ${fmtClock(elapsed - fc)}` : "19.5%  |  02:55"} color="#FFE6D9" />
-              <Tile label="Development" value={devPct > 0 ? `${devPct.toFixed(1)}%  |  ${fmtClock(elapsed - fc)}` : "19.5%  |  02:55"} color="#FFE6D9" />
-              <Tile label="Turn Point" value="75°C  |  01:36" color="#FFE6D9" />
-              <Tile label="Green bean temp" value="76.5 °C" color="#FFE6D9" />
-            </div>
-          </div>
-          <div className="roast-panel-section">
-            <div className="sec-t">Roast Input Details</div>
-            <div className="roast-inputs">
-              <div className="field">
-                <label>Bean Colour</label>
-                <div className="control"><input placeholder="00" /><Icon name="info" size={15} className="hint" /></div>
-              </div>
-              <div className="field">
-                <label>Ground Colour</label>
-                <div className="control"><input placeholder="00" /><Icon name="info" size={15} /></div>
-              </div>
-              <div className="field">
-                <label>Roasted Weight</label>
-                <div className="control"><span style={{ color: "var(--gray-400)", fontSize: 14 }}>kg</span><input placeholder="00" /><Icon name="info" size={15} /></div>
+        {/* roast data panel — content switches with the utility rail; only the "trend"
+            panel has a Figma frame (14/15); the others reuse the same design system */}
+        {panel === "trend" && (
+          <div className="roast-panel">
+            <div className="roast-panel-title">Roast Profile Data</div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Roast Details</div>
+              <div className="tiles">
+                <Tile label="Roast Time" value={running || elapsed > 0 ? fmtClock(elapsed) : "14:33"} color="#FFE6D9" wide />
+                <Tile label="Bean Temperature" value={`${cur.bean || 195.8} °C`} color="#FFE6D9" />
+                <Tile label="Bean RoR" value={`${cur.ror || 12.6} °C/30s`} color="#FFE6D9" />
+                <Tile label="Exhaust Temp" value={`${cur.exhaust || 207.3} °C`} color="#FFF5CE" />
+                <Tile label="Recirculating Temp" value={`${cur.drum || 207.3} °C`} color="#FCE7F6" />
+                <Tile label="First Crack" value={devPct > 0 ? `${devPct.toFixed(1)}%  |  ${fmtClock(elapsed - fc)}` : "19.5%  |  02:55"} color="#FFE6D9" />
+                <Tile label="Development" value={devPct > 0 ? `${devPct.toFixed(1)}%  |  ${fmtClock(elapsed - fc)}` : "19.5%  |  02:55"} color="#FFE6D9" />
+                <Tile label="Turn Point" value="75°C  |  01:36" color="#FFE6D9" />
+                <Tile label="Green bean temp" value="76.5 °C" color="#FFE6D9" />
               </div>
             </div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Roast Input Details</div>
+              <div className="roast-inputs">
+                <div className="field">
+                  <label>Bean Colour</label>
+                  <div className="control"><input placeholder="00" /><Icon name="info" size={15} className="hint" /></div>
+                </div>
+                <div className="field">
+                  <label>Ground Colour</label>
+                  <div className="control"><input placeholder="00" /><Icon name="info" size={15} /></div>
+                </div>
+                <div className="field">
+                  <label>Roasted Weight</label>
+                  <div className="control"><span style={{ color: "var(--gray-400)", fontSize: 14 }}>kg</span><input placeholder="00" /><Icon name="info" size={15} /></div>
+                </div>
+              </div>
+            </div>
+            <div className="panel-actions">
+              <button className="btn btn-outline"><Icon name="trash" size={15} /> Reject Batch</button>
+              <button className="btn btn-primary" onClick={() => setDrawer(true)}><Icon name="save" size={15} /> Save Batch</button>
+            </div>
           </div>
-          <div className="panel-actions">
-            <button className="btn btn-outline"><Icon name="trash" size={15} /> Reject Batch</button>
-            <button className="btn btn-primary" onClick={() => setDrawer(true)}><Icon name="save" size={15} /> Save Batch</button>
-          </div>
-        </div>
+        )}
 
-        {/* far-right utility rail */}
+        {panel === "grid" && (
+          <div className="roast-panel">
+            <div className="roast-panel-title">Session Overview</div>
+            <div className="roast-panel-section">
+              <div className="sec-t">This Session</div>
+              <div className="tiles">
+                <Tile label="Session Time" value={running || elapsed > 0 ? fmtClock(elapsed, true) : "00:00:00"} color="#E2EFFC" wide />
+                <Tile label="Batches Queued" value={String(batches.length)} color="#E2EFFC" />
+                <Tile label="Batches Done" value={elapsed >= ROAST_DURATION ? "1" : "0"} color="#EDF9E8" />
+                <Tile label="Green Weight" value={`${batches.reduce((s, b) => s + b.kg, 0)} kg`} color="#E2EFFC" />
+                <Tile label="Rounded Up" value="12 kg" color="#FFF5CE" />
+                <Tile label="Bean" value="Costa Rica Fancy" color="#FCE7F6" wide />
+              </div>
+            </div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Machine</div>
+              <div className="tiles">
+                <Tile label="Roaster" value="ProRoast Evolution" color="#E2EFFC" wide />
+                <Tile label="Capacity" value="4 kg / batch" color="#E2EFFC" />
+                <Tile label="Mode" value={running ? "Roasting" : "Standby"} color={running ? "#FEECEB" : "#EDF9E8"} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {panel === "wrench" && (
+          <div className="roast-panel">
+            <div className="roast-panel-title">Machine Settings</div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Setpoints (read-only)</div>
+              <div className="probe-list">
+                {[
+                  { l: "Fan Speed", v: `${roastData.setpoints.fan}%`, c: "var(--c-fan, #1b8adc)" },
+                  { l: "Burner Power", v: `${roastData.setpoints.power}%`, c: "var(--warning-500)" },
+                  { l: "Drum RPM", v: `${roastData.setpoints.rpm} RPM`, c: "var(--sky)" },
+                ].map((p) => (
+                  <div className="probe-row" key={p.l}>
+                    <span className="dot" style={{ background: p.c }} />
+                    <span className="l">{p.l}</span>
+                    <span className="v">{p.v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Telemetry</div>
+              <div className="probe-list">
+                <div className="probe-row"><span className="dot" style={{ background: "var(--success-500, #5dbc3a)" }} /><span className="l">Probe Link</span><span className="v">Simulated</span></div>
+                <div className="probe-row"><span className="dot" style={{ background: "var(--success-500, #5dbc3a)" }} /><span className="l">Sample Rate</span><span className="v">5 s</span></div>
+                <div className="probe-row"><span className="dot" style={{ background: "var(--gray-300)" }} /><span className="l">Heat Control</span><span className="v">Manual (v1)</span></div>
+              </div>
+              <div className="panel-note">v1 telemetry is read-only — ProRoast never controls roaster heat.</div>
+            </div>
+          </div>
+        )}
+
+        {panel === "alert" && (
+          <div className="roast-panel">
+            <div className="roast-panel-title">Alerts &amp; Events</div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Roast Events</div>
+              <div className="event-list">
+                {[
+                  { t: 0, label: "Charge — beans in", kind: "info" },
+                  { t: 96, label: "Turning point 76.5 °C", kind: "info" },
+                  { t: roastData.phases.yellowingEnd, label: "Yellowing complete", kind: "warn" },
+                  { t: roastData.phases.firstCrack, label: "First crack detected", kind: "error" },
+                  { t: roastData.phases.drop, label: "Drop — roast complete", kind: "success" },
+                ].map((e) => {
+                  const hit = elapsed >= e.t && (running || elapsed > 0);
+                  return (
+                    <div className={"event-row" + (hit ? " hit" : "")} key={e.label}>
+                      <span className={"dot " + e.kind} />
+                      <div>
+                        <div className="l">{e.label}</div>
+                        <div className="s">{hit ? `at ${fmtClock(e.t)}` : "pending"}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Cracks</div>
+              <div className="panel-note">{roastData.cracks.filter((c) => c.t <= elapsed).length} of {roastData.cracks.length} crack events heard this roast.</div>
+            </div>
+          </div>
+        )}
+
+        {panel === "comment" && (
+          <div className="roast-panel">
+            <div className="roast-panel-title">Roast Notes</div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Add a note</div>
+              <div className="field">
+                <textarea className="plain" placeholder="Note colour change, smell, adjustments…" />
+              </div>
+              <button className="btn btn-primary" style={{ width: "100%", marginTop: 10 }}><Icon name="comment" size={15} /> Save note</button>
+            </div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Earlier</div>
+              <div className="event-list">
+                <div className="event-row hit"><span className="dot info" /><div><div className="l">Smells grassy → sweet at yellowing.</div><div className="s">Olivia · batch 1</div></div></div>
+                <div className="event-row hit"><span className="dot info" /><div><div className="l">Try 2% less power after first crack next time.</div><div className="s">Olivia · last session</div></div></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {panel === "thermometer" && (
+          <div className="roast-panel">
+            <div className="roast-panel-title">Probes</div>
+            <div className="roast-panel-section">
+              <div className="sec-t">Live Readings</div>
+              <div className="probe-list">
+                {[
+                  { l: "Bean Temp", v: `${cur.bean} °C`, c: "var(--c-bean)" },
+                  { l: "Air Temp", v: `${cur.air} °C`, c: "var(--c-air)" },
+                  { l: "Exhaust Temp", v: `${cur.exhaust} °C`, c: "var(--c-exhaust)" },
+                  { l: "Drum Temp", v: `${cur.drum} °C`, c: "var(--c-drum)" },
+                  { l: "Bean RoR", v: `${cur.ror} °C/30s`, c: "var(--c-ror)" },
+                  { l: "Modulation", v: `${cur.actual}%`, c: "var(--c-actual)" },
+                ].map((p) => (
+                  <div className="probe-row" key={p.l}>
+                    <span className="dot" style={{ background: p.c }} />
+                    <span className="l">{p.l}</span>
+                    <span className="v">{p.v}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="panel-note">{running ? "Streaming simulated telemetry." : "Standby — last sampled values."}</div>
+            </div>
+          </div>
+        )}
+
+        {/* far-right utility rail — click to switch panels, click active icon to close */}
         <div className="util-rail">
-          {["grid", "wrench", "alert", "comment", "trend", "thermometer"].map((ic, i) => (
-            <button key={ic} className={"rail-btn" + (i === 4 ? " active" : "")}>
+          {["grid", "wrench", "alert", "comment", "trend", "thermometer"].map((ic) => (
+            <button
+              key={ic}
+              className={"rail-btn" + (panel === ic ? " active" : "")}
+              title={{ grid: "Session Overview", wrench: "Machine Settings", alert: "Alerts & Events", comment: "Roast Notes", trend: "Roast Profile Data", thermometer: "Probes" }[ic]}
+              onClick={() => setPanel(panel === ic ? null : ic)}
+            >
               <Icon name={ic} size={18} />
             </button>
           ))}

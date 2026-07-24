@@ -162,6 +162,31 @@ table.uui tbody tr:hover { background: var(--gray-50); }
 .score-stars { display: inline-flex; gap: 2px; }
 table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* util-rail switchable panels (live page) */
+.probe-list { display: flex; flex-direction: column; }
+.probe-row {
+  display: flex; align-items: center; gap: 10px; padding: 10px 4px;
+  border-bottom: 1px solid var(--gray-100); font-size: 13px;
+}
+.probe-row:last-child { border-bottom: 0; }
+.probe-row .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.probe-row .l { color: var(--gray-600); }
+.probe-row .v { margin-left: auto; font-weight: 600; color: var(--gray-900); font-variant-numeric: tabular-nums; }
+.event-list { display: flex; flex-direction: column; gap: 4px; }
+.event-row { display: flex; gap: 10px; padding: 8px 4px; border-radius: 8px; opacity: 0.45; }
+.event-row.hit { opacity: 1; }
+.event-row .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; background: var(--gray-300); }
+.event-row .dot.info { background: var(--primary-500); }
+.event-row .dot.warn { background: var(--warning-500); }
+.event-row .dot.error { background: var(--error-500); }
+.event-row .dot.success { background: var(--success-500); }
+.event-row .l { font-size: 13px; color: var(--gray-800); font-weight: 500; }
+.event-row .s { font-size: 11.5px; color: var(--gray-400); margin-top: 1px; }
+.panel-note {
+  margin: 10px 0 8px; padding: 9px 11px; background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: 8px; font-size: 12px; color: var(--gray-500); line-height: 1.45;
+}
+
 /* progress bar */
 .progress { display: flex; align-items: center; gap: 10px; min-width: 120px; }
 .progress .track { flex: 1; height: 8px; border-radius: 999px; background: var(--gray-200); overflow: hidden; }
