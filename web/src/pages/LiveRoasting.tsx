@@ -164,7 +164,9 @@ export default function LiveRoasting() {
 
       {/* session overview dropdown (frame 44) */}
       {headOpen && (
-        <div className="session-overview">
+        <>
+          <div className="session-scrim" onClick={() => setHeadOpen(false)} />
+          <div className="session-overview">
           <div className="col">
             <div className="col-t">In queue</div>
             {[
@@ -224,7 +226,8 @@ export default function LiveRoasting() {
               </div>
             ))}
           </div>
-        </div>
+          </div>
+        </>
       )}
 
       <div className="live-body">

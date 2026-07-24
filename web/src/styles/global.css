@@ -433,6 +433,7 @@ table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; tex
 }
 
 /* session overview dropdown (frame 44) */
+.session-scrim { position: fixed; inset: 0; z-index: 29; }
 .session-overview {
   position: absolute; top: 93px; left: 0; right: 0; z-index: 30;
   display: flex; background: #fff; border-bottom: 1px solid var(--gray-200);

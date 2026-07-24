@@ -16,6 +16,21 @@ import { beans, batches, profiles } from "./src/data";
 const SIM_SPEED = 14;
 
 type Tab = "live" | "queue" | "profiles" | "stock";
+type Mode = "standby" | "preheat" | "roasting" | "cooldown";
+
+const MODE_LABEL: Record<Mode, string> = { standby: "Standby", preheat: "Preheat", roasting: "Roasting", cooldown: "Cooldown" };
+const MODE_COLOR: Record<Mode, string> = {
+  standby: colors.navy,
+  preheat: colors.warn,
+  roasting: colors.dangerBright,
+  cooldown: colors.blue,
+};
+const MODE_TINT: Record<Mode, string> = {
+  standby: colors.bg,
+  preheat: colors.warnTint,
+  roasting: colors.dangerTint,
+  cooldown: colors.blueTint,
+};
 
 export default function App() {
   return (
@@ -29,12 +44,14 @@ function Root() {
   const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<Tab>("live");
 
-  // ---- shared roast session state ----
+  // ---- shared roast session state (mode system mirrors the web cockpit, frames 39/41) ----
   const data = useMemo(() => generateRoast(7), []);
-  const [running, setRunning] = useState(false);
+  const [mode, setMode] = useState<Mode>("standby");
+  const running = mode === "roasting";
   const [elapsed, setElapsed] = useState(0);
   const raf = useRef(0);
   const startRef = useRef(0);
+  const phaseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!running) return;
@@ -42,7 +59,9 @@ function Root() {
       const e = ((Date.now() - startRef.current) / 1000) * SIM_SPEED;
       if (e >= ROAST_DURATION) {
         setElapsed(ROAST_DURATION);
-        setRunning(false);
+        setMode("cooldown");
+        if (phaseTimer.current) clearTimeout(phaseTimer.current);
+        phaseTimer.current = setTimeout(() => setMode("standby"), 5000);
         return;
       }
       setElapsed(e);
@@ -52,19 +71,33 @@ function Root() {
     return () => cancelAnimationFrame(raf.current);
   }, [running]);
 
+  useEffect(() => () => { if (phaseTimer.current) clearTimeout(phaseTimer.current); }, []);
+
   const start = () => {
-    startRef.current = Date.now();
     setElapsed(0.01);
-    setRunning(true);
+    setMode("preheat");
+    if (phaseTimer.current) clearTimeout(phaseTimer.current);
+    phaseTimer.current = setTimeout(() => {
+      startRef.current = Date.now();
+      setMode("roasting");
+    }, 3500);
   };
-  const stop = () => setRunning(false);
+  const stop = () => {
+    if (phaseTimer.current) clearTimeout(phaseTimer.current);
+    if (mode === "roasting") {
+      setMode("cooldown");
+      phaseTimer.current = setTimeout(() => setMode("standby"), 5000);
+    } else {
+      setMode("standby");
+    }
+  };
 
   return (
     <View style={[st.app, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" />
-      <Header running={running} />
+      <Header mode={mode} />
       <ScrollView style={st.body} contentContainerStyle={{ padding: 16, paddingBottom: 24, gap: 12 }}>
-        {tab === "live" && <LiveScreen data={data} elapsed={elapsed} running={running} onStart={start} onStop={stop} />}
+        {tab === "live" && <LiveScreen data={data} elapsed={elapsed} mode={mode} onStart={start} onStop={stop} />}
         {tab === "queue" && <QueueScreen elapsed={elapsed} running={running} />}
         {tab === "profiles" && <ProfilesScreen />}
         {tab === "stock" && <StockScreen />}
@@ -74,7 +107,7 @@ function Root() {
   );
 }
 
-function Header({ running }: { running: boolean }) {
+function Header({ mode }: { mode: Mode }) {
   return (
     <View style={st.header}>
       <LogoMark size={32} />
@@ -82,9 +115,9 @@ function Header({ running }: { running: boolean }) {
         <Text style={st.headerTitle}>ProRoast Companion</Text>
         <Text style={st.headerSub}>Genio Roasters</Text>
       </View>
-      <View style={[st.modeChip, running && st.modeChipLive]}>
-        <View style={[st.dot, { backgroundColor: running ? colors.dangerBright : colors.success }]} />
-        <Text style={[st.modeChipText, running && { color: colors.danger }]}>{running ? "Roasting" : "Standby"}</Text>
+      <View style={[st.modeChip, mode !== "standby" && { backgroundColor: MODE_TINT[mode], borderColor: MODE_COLOR[mode] + "55" }]}>
+        <View style={[st.dot, { backgroundColor: MODE_COLOR[mode] }]} />
+        <Text style={[st.modeChipText, mode !== "standby" && { color: MODE_COLOR[mode] }]}>{MODE_LABEL[mode]}</Text>
       </View>
     </View>
   );
@@ -93,16 +126,17 @@ function Header({ running }: { running: boolean }) {
 function LiveScreen({
   data,
   elapsed,
-  running,
+  mode,
   onStart,
   onStop,
 }: {
   data: ReturnType<typeof generateRoast>;
   elapsed: number;
-  running: boolean;
+  mode: Mode;
   onStart: () => void;
   onStop: () => void;
 }) {
+  const running = mode !== "standby";
   const now = sampleAt(data, elapsed);
   const cracks = data.cracks.filter((c) => c.t <= elapsed).length;
   const dev = elapsed > data.phases.firstCrack ? ((elapsed - data.phases.firstCrack) / elapsed) * 100 : 0;
