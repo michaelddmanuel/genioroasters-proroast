@@ -365,13 +365,15 @@ table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; tex
   align-items: center; padding: 16px 0; gap: 6px; flex-shrink: 0; border-radius: 0 12px 12px 0; position: relative;
 }
 
-/* sidebar collapse/expand toggle */
+/* sidebar collapse/expand toggle — integrated, not floating */
 .side-toggle {
-  position: absolute; top: 30px; right: -13px; width: 26px; height: 26px; border-radius: 50%;
-  background: #fff; border: 1px solid var(--gray-200); color: var(--gray-500);
-  display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow-sm); z-index: 6;
+  width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.85);
+  display: grid; place-items: center; cursor: pointer; transition: background 0.15s;
 }
-.side-toggle:hover { color: var(--navy-mid); background: var(--gray-50); }
+.side-toggle:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.sidebar .brand .side-toggle { margin-left: auto; }
+.rail .side-toggle { margin-bottom: 4px; }
 .rail .rail-btn {
   width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center;
   color: rgba(255,255,255,0.85); background: none; border: 0;
@@ -388,16 +390,27 @@ table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; tex
 .util-rail .rail-btn:hover:not(.active) { background: var(--primary-100); }
 
 /* ---------- Live roasting layout ---------- */
-.live { display: flex; flex-direction: column; height: 100%; min-width: 0; }
+.live { display: flex; flex-direction: column; height: 100%; min-width: 0; position: relative; }
 .live-head {
   display: flex; align-items: center; gap: 16px; padding: 12px 20px;
   border-bottom: 1px solid var(--gray-200); background: #fff;
 }
 .live-head .bean-avatar { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--gray-200); object-fit: cover; }
+.live-head .bean-tile { position: relative; display: inline-flex; }
+.live-head .mode-dot {
+  position: absolute; right: -3px; bottom: -3px; width: 15px; height: 15px; border-radius: 50%;
+  border: 2.5px solid #fff; background: var(--gray-400);
+}
+.live-head .mode-dot.standby { background: var(--navy); }
+.live-head .mode-dot.preheat { background: var(--warning-500); }
+.live-head .mode-dot.roasting { background: var(--error-500); }
+.live-head .mode-dot.cooldown { background: var(--primary-500); }
 .live-head h1 { font-size: 20px; font-weight: 600; }
 .live-head .mode { font-size: 12px; font-weight: 600; }
-.live-head .mode.standby { color: var(--gray-600); }
+.live-head .mode.standby { color: var(--navy); }
+.live-head .mode.preheat { color: var(--warning-500); }
 .live-head .mode.roasting { color: var(--error-600); }
+.live-head .mode.cooldown { color: var(--primary-500); }
 .live-head .mode small { color: var(--gray-500); font-weight: 400; margin-left: 4px; }
 .live-head .meta { display: flex; gap: 8px; margin-top: 3px; }
 .live-head .chip {
@@ -405,10 +418,56 @@ table.uui td.desc { max-width: 250px; white-space: nowrap; overflow: hidden; tex
   border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--gray-700); font-weight: 500;
 }
 .live-head .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+/* header session-dropdown trigger (frames 43/44: white square, blue border + chevron) */
+.head-dd {
+  width: 34px; height: 34px; border: 1px solid var(--primary-300); border-radius: 8px;
+  display: grid; place-items: center; background: #fff; color: var(--primary-600);
+  cursor: pointer; transition: background 0.15s;
+}
+.head-dd:hover { background: var(--primary-100); }
+.head-dd svg { transition: transform 0.2s; }
+.head-dd.open svg { transform: rotate(180deg); }
 .live-head .collapse {
   width: 34px; height: 34px; border: 1px solid var(--gray-300); border-radius: 8px;
   display: grid; place-items: center; background: #fff; color: var(--gray-500);
 }
+
+/* session overview dropdown (frame 44) */
+.session-overview {
+  position: absolute; top: 93px; left: 0; right: 0; z-index: 30;
+  display: flex; background: #fff; border-bottom: 1px solid var(--gray-200);
+  box-shadow: 0 18px 30px -12px rgba(16, 24, 40, 0.18);
+  animation: sess-in 0.18s ease backwards;
+}
+@keyframes sess-in { from { transform: translateY(-8px); } to { transform: none; } }
+.session-overview .col { flex: 1; padding: 16px 20px 20px; min-width: 0; }
+.session-overview .col + .col { border-left: 1px solid var(--gray-100); }
+.session-overview .col.current { background: var(--gray-50); max-width: 400px; }
+.session-overview .col-t { font-size: 15px; font-weight: 600; color: var(--gray-900); font-family: var(--font-display); margin-bottom: 12px; }
+.session-overview .cur-name { font-size: 14.5px; font-weight: 600; color: var(--gray-900); font-family: var(--font-display); }
+.session-overview .cur-sub { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--primary-600); font-weight: 600; margin-bottom: 12px; }
+.session-overview .cur-sub .lbl { color: var(--gray-400); font-weight: 400; }
+.sess-card {
+  border: 1px solid var(--gray-200); border-radius: 10px; background: #fff; padding: 12px 14px;
+  margin-bottom: 10px; box-shadow: var(--shadow-xs);
+}
+.sess-card .n { font-size: 13.5px; font-weight: 600; color: var(--gray-900); font-family: var(--font-display); margin-bottom: 7px; }
+.sess-card .r { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--primary-600); font-weight: 600; }
+.sess-card .r .lbl { color: var(--gray-400); font-weight: 400; }
+.sess-card .r .kg { color: var(--gray-700); font-weight: 600; }
+.sess-card .r .end { margin-left: auto; color: var(--gray-400); }
+.sess-card .r .status { color: var(--gray-500); font-weight: 500; }
+.sess-card .r .status.saved { color: var(--primary-500); font-weight: 600; }
+.sess-card.batch .r { color: var(--gray-500); font-weight: 400; }
+
+/* queue group expander (frame 43) */
+.group-toggle {
+  margin-left: auto; width: 24px; height: 24px; display: grid; place-items: center;
+  background: none; border: 0; color: var(--gray-500); border-radius: 6px; cursor: pointer;
+}
+.group-toggle:hover { background: var(--gray-100); }
+.group-toggle svg { transition: transform 0.2s; }
+.group-toggle.open svg { transform: rotate(180deg); }
 .live-body { flex: 1; display: flex; min-height: 0; }
 .live-center { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: 10px 12px 12px; }
 

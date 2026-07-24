@@ -19,14 +19,14 @@ export function Sidebar({ onToggle }: { onToggle?: () => void }) {
   const nav = useNavigate();
   return (
     <aside className="sidebar">
-      {onToggle && (
-        <button className="side-toggle" title="Collapse menu" onClick={onToggle}>
-          <Icon name="chevron-left" size={15} />
-        </button>
-      )}
       <div className="brand">
         <LogoMark size={30} />
         <span>ProRoast</span>
+        {onToggle && (
+          <button className="side-toggle" title="Collapse menu" onClick={onToggle}>
+            <Icon name="chevron-left" size={16} />
+          </button>
+        )}
       </div>
       <div className="search">
         <Icon name="search" size={17} />
@@ -68,14 +68,14 @@ export function Rail({ onToggle }: { onToggle?: () => void }) {
   const nav = useNavigate();
   return (
     <aside className="rail">
-      {onToggle && (
-        <button className="side-toggle" title="Expand menu" onClick={onToggle}>
-          <Icon name="chevron-right" size={15} />
-        </button>
-      )}
-      <div style={{ marginBottom: 10 }}>
+      <div style={{ marginBottom: 6 }}>
         <LogoMark size={28} />
       </div>
+      {onToggle && (
+        <button className="side-toggle" title="Expand menu" onClick={onToggle}>
+          <Icon name="chevron-right" size={16} />
+        </button>
+      )}
       <button className="rail-btn" title="Search">
         <Icon name="search" size={19} />
       </button>

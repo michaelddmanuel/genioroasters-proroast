@@ -17,12 +17,19 @@ const initialBatches: Batch[] = [
   { id: 3, name: "Costa Rica Fancy", kg: 4, progress: 0, status: "queued" },
 ];
 
+type Mode = "standby" | "preheat" | "roasting" | "cooldown";
+
+const MODE_LABEL: Record<Mode, string> = { standby: "Standby", preheat: "Preheat", roasting: "Roasting", cooldown: "Cooldown" };
+
 export default function LiveRoasting() {
-  const [running, setRunning] = useState(false);
+  const [mode, setMode] = useState<Mode>("standby");
+  const running = mode === "roasting";
   const [elapsed, setElapsed] = useState(0);
   const [tab, setTab] = useState<"current" | "queue" | "completed">("current");
   const [drawer, setDrawer] = useState(false);
   const [panel, setPanel] = useState<string | null>("trend");
+  const [headOpen, setHeadOpen] = useState(false);
+  const [groupOpen, setGroupOpen] = useState(true);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [saveDefault, setSaveDefault] = useState(false);
   const [profileName, setProfileName] = useState("");
@@ -33,6 +40,7 @@ export default function LiveRoasting() {
   const [overId, setOverId] = useState<number | null>(null);
   const raf = useRef<number | null>(null);
   const lastTs = useRef<number>(0);
+  const phaseTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!running) return;
@@ -43,7 +51,10 @@ export default function LiveRoasting() {
       setElapsed((e) => {
         const next = e + dt;
         if (next >= ROAST_DURATION) {
-          setRunning(false);
+          // roast complete → cooldown, then standby (frames 39/41 mode system)
+          setMode("cooldown");
+          if (phaseTimer.current) window.clearTimeout(phaseTimer.current);
+          phaseTimer.current = window.setTimeout(() => setMode("standby"), 5000);
           return ROAST_DURATION;
         }
         return next;
@@ -57,6 +68,8 @@ export default function LiveRoasting() {
     };
   }, [running]);
 
+  useEffect(() => () => { if (phaseTimer.current) window.clearTimeout(phaseTimer.current); }, []);
+
   const cur = sampleAt(roastData, elapsed);
   const pctRoast = Math.round((elapsed / ROAST_DURATION) * 100);
   const fc = roastData.phases.firstCrack;
@@ -64,10 +77,20 @@ export default function LiveRoasting() {
 
   const start = () => {
     setElapsed(0);
-    setRunning(true);
     setBatches((b) => b.map((x) => (x.status === "current" ? { ...x, progress: 0 } : x)));
+    setMode("preheat");
+    if (phaseTimer.current) window.clearTimeout(phaseTimer.current);
+    phaseTimer.current = window.setTimeout(() => setMode("roasting"), 3500);
   };
-  const stop = () => setRunning(false);
+  const stop = () => {
+    if (phaseTimer.current) window.clearTimeout(phaseTimer.current);
+    if (mode === "roasting") {
+      setMode("cooldown");
+      phaseTimer.current = window.setTimeout(() => setMode("standby"), 5000);
+    } else {
+      setMode("standby");
+    }
+  };
 
   useEffect(() => {
     if (running) {
@@ -100,13 +123,16 @@ export default function LiveRoasting() {
 
   return (
     <div className="live">
-      {/* header */}
+      {/* header — mode system + session dropdown (frames 39/41/42/43/44) */}
       <div className="live-head">
-        <img className="bean-avatar" src="/assets/bean-thumb.png" alt="" />
+        <span className="bean-tile">
+          <img className="bean-avatar" src="/assets/bean-thumb.png" alt="" />
+          <span className={"mode-dot " + mode} />
+        </span>
         <div>
           <h1>Casta Rica Fancy</h1>
-          <div className={"mode " + (running ? "roasting" : "standby")}>
-            {running ? "Roasting" : "Standby"} <small>Mode</small>
+          <div className={"mode " + mode}>
+            {MODE_LABEL[mode]} <small>Mode</small>
           </div>
           <div className="meta" style={{ marginTop: 2 }}>
             <span style={{ fontSize: 11.5, color: "var(--gray-500)" }}>Roast Session</span>
@@ -116,21 +142,90 @@ export default function LiveRoasting() {
             </span>
             <span className="chip">
               <Icon name="clock" size={13} />
-              {running ? "02:20:30" : "00:00:00"}
+              {mode === "roasting" || mode === "cooldown" ? fmtClock(elapsed, true) : mode === "preheat" ? "00:03:30" : "00:00:00"}
             </span>
           </div>
         </div>
         <div className="right">
-          <button className="collapse">
-            <Icon name={running ? "chevron-down" : "chevron-up"} size={16} />
+          <button
+            className={"head-dd" + (headOpen ? " open" : "")}
+            title="Session overview"
+            onClick={() => setHeadOpen((o) => !o)}
+          >
+            <Icon name="chevron-down" size={16} />
           </button>
-          {running ? (
-            <button className="btn btn-primary btn-sm" onClick={stop}>Stop Roast</button>
-          ) : (
+          {mode === "standby" ? (
             <button className="btn btn-primary btn-sm" onClick={start}>Start Roast</button>
+          ) : (
+            <button className="btn btn-primary btn-sm" onClick={stop}>Stop Roast</button>
           )}
         </div>
       </div>
+
+      {/* session overview dropdown (frame 44) */}
+      {headOpen && (
+        <div className="session-overview">
+          <div className="col">
+            <div className="col-t">In queue</div>
+            {[
+              { n: "Brazil Santos", kg: 8 },
+              { n: "Evening Roast", kg: 16 },
+              { n: "Summer Special", kg: 8 },
+            ].map((s) => (
+              <div className="sess-card" key={s.n}>
+                <div className="n">{s.n}</div>
+                <div className="r">
+                  <Icon name="arrow-up" size={13} />
+                  <span className="kg">{s.kg}kg</span>
+                  <span className="lbl">Rounded up</span>
+                  <Icon name="chevron-down" size={15} className="end" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="col">
+            <div className="col-t">Completed</div>
+            {[
+              { n: "Jamaican Blue Mountain", saved: false },
+              { n: "Evening Roast", saved: false },
+              { n: "Summer Special", saved: true },
+            ].map((s) => (
+              <div className="sess-card" key={s.n}>
+                <div className="n">{s.n}</div>
+                <div className="r">
+                  <span className="lbl">Status:</span>
+                  <span className={"status" + (s.saved ? " saved" : "")}>{s.saved ? "Saved" : "Not saved"}</span>
+                  <Icon name="chevron-down" size={15} className="end" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="col current">
+            <div className="col-t">Current</div>
+            <div className="cur-name">Costa Rica Fancy</div>
+            <div className="progress blue" style={{ margin: "6px 0 4px" }}>
+              <div className="track"><div className="fill" style={{ width: `${Math.max(10, pctRoast / 3)}%` }} /></div>
+              <span className="pct" style={{ color: "var(--primary-500)" }}>{Math.max(10, Math.round(pctRoast / 3))}%</span>
+            </div>
+            <div className="cur-sub"><Icon name="arrow-up" size={13} /> 12kg <span className="lbl">Rounded up</span></div>
+            {batches.slice(0, 2).map((b) => (
+              <div className="sess-card batch" key={b.id}>
+                <div className="n">{b.name}</div>
+                <div className="progress">
+                  <div className="track"><div className="fill" style={{ width: `${b.progress}%`, background: b.status === "current" ? "var(--navy-mid)" : "var(--gray-300)" }} /></div>
+                  <span className="pct">{b.progress}%</span>
+                </div>
+                <div className="r">
+                  <span className="kg">{b.kg}kg</span>
+                  <span className="lbl">Batch {b.id}</span>
+                  {b.status === "current" && b.time && <span className="chip" style={{ marginLeft: "auto" }}><Icon name="clock" size={11} /> {b.time}</span>}
+                  {b.status === "next" && <span className="chip" style={{ marginLeft: "auto" }}><Icon name="arrow-up" size={10} /> Up Next</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="live-body">
         {/* batch queue */}
@@ -153,12 +248,18 @@ export default function LiveRoasting() {
                 <Icon name="arrow-up" size={13} />
                 <span>12kg</span>
                 <span className="lbl">Rounded up</span>
-                <span style={{ marginLeft: "auto" }}><Icon name="chevron-down" size={14} /></span>
+                <button
+                  className={"group-toggle" + (groupOpen ? " open" : "")}
+                  title={groupOpen ? "Collapse batches" : "Expand batches"}
+                  onClick={() => setGroupOpen((o) => !o)}
+                >
+                  <Icon name="chevron-down" size={14} />
+                </button>
               </div>
             </div>
 
-            {shownBatches.length === 0 && <div style={{ color: "var(--gray-400)", fontSize: 12.5, textAlign: "center", padding: "30px 0" }}>No completed batches yet</div>}
-            {shownBatches.map((b) => (
+            {groupOpen && shownBatches.length === 0 && <div style={{ color: "var(--gray-400)", fontSize: 12.5, textAlign: "center", padding: "30px 0" }}>No completed batches yet</div>}
+            {groupOpen && shownBatches.map((b) => (
               <div
                 className={
                   "batch-card" +
@@ -457,7 +558,7 @@ export default function LiveRoasting() {
                 className="btn btn-primary"
                 onClick={() => {
                   setConfirmRemove(false);
-                  setRunning(false);
+                  setMode("standby");
                   setElapsed(0);
                   setBatches((b) => b.map((x) => (x.id === 1 ? { ...x, progress: 0, time: undefined } : x)));
                 }}
